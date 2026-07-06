@@ -6,6 +6,15 @@ if the data isn't there, called userfaulting.  Unfortunately, barely anyone know
 
 This allows you to lazily download chunks of data, as you read the underlying array, while caching blocks to your file system. This makes it LIGHTING fast for probing data remotely as you only download what you need.
 
+## Running the Demo
+
+```
+pip install polars numpy maturin
+maturin develop
+python demo.py
+```
+
+
 ```python
 alloc = demandmap.S3Alloc(
     "./cache.bin",
