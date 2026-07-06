@@ -73,9 +73,9 @@ This has a persistent memory mapped lru cache where blocks are downloaded to, ma
 
 This is very very rough and not ready for production and only supports macOS.
 
-- [x] Linux userfaultfd handling
-- [x] Windows API
-- [x] Signal and error handling
-- [x] Prefaulting data.
-- [x] More options around caching.
-- [x] Nonblocking coroutines
+- [ ] Linux userfaultfd handling
+- [ ] Windows API
+- [ ] Signal and error handling
+- [ ] Prefaulting data.
+- [ ] More options around caching.
+- [ ] Nonblocking coroutines
