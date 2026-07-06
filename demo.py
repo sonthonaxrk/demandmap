@@ -62,6 +62,6 @@ def ndarray_from_npy_buffer(buf, *, max_header_size=10_000):
 arr = demandmap.S3Array("./cache.bin", "https://rollo-testing.lon1.digitaloceanspaces.com/big_col.npz.npy", 512, 1048576)
 print(arr.nbytes, "bytes")
 
+assert arr.nbytes > 100000000
 a = ndarray_from_npy_buffer(arr)
-
 print(a[-1])
