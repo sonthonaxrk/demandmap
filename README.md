@@ -58,9 +58,7 @@ let buf = cache.callback_buffer(
     length,
     path,
     etag, 
-    |url, range, mut buf| {
-        get(s3_url, range).read_into(buf)
-});
+    |url, range, mut buf| get(s3_url, range).read_into(buf));
 
 assert_eq!(buf[10000..10010], b"my s3 data");
 ```
@@ -75,9 +73,9 @@ This has a persistent memory mapped lru cache where blocks are downloaded to, ma
 
 This is very very rough and not ready for production and only supports macOS.
 
-- [] Linux userfaultfd handling
-- [] Windows API
-- [] Signal and error handling
-- [] Prefaulting data.
-- [] More options around caching.
-- [] Nonblocking coroutines
+- [x] Linux userfaultfd handling
+- [x] Windows API
+- [x] Signal and error handling
+- [x] Prefaulting data.
+- [x] More options around caching.
+- [x] Nonblocking coroutines
