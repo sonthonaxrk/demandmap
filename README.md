@@ -56,7 +56,7 @@ df = pl.DataFrame([
 # └──────────┴──────────┘
 ```
 
-–--
+---
 
 And the Rust API.
 
@@ -73,7 +73,7 @@ assert_eq!(buf[10000..10010], b"my s3 data");
 
 This has a persistent memory mapped lru cache where blocks are downloaded to, making repeated runs and restarts as fast as they would be locally.
 
----
+----
 
 ## TODOS
 
