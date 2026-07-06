@@ -4,7 +4,7 @@ How many times have you been *forced* to download a big file from S3? There's a 
 underutilised API on modern systems that allows you to index arrays and _attach callbacks_
 if the data isn't there, called userfaulting.  Unfortunately, barely anyone knows about this and the API differs on Windows, Linux, and macOS, respectively increasing in just how esoteric the API is.
 
-This allows you to lazily download chunks of data, as you read the underlying array, while caching blocks to your file system. This makes it LIGHTING fast for probing data remotely as you only download what you need.
+This allows you to lazily download chunks of data, as you read the underlying array, while caching blocks to your file system. This makes it LIGHTNING fast for probing data remotely as you only download what you need.
 
 ## Running the Demo
 
