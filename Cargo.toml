@@ -1,0 +1,21 @@
+[package]
+name = "demandmap"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+extension-module = ["pyo3/extension-module"]
+
+[dependencies]
+allocator-api2 = "0.4.0"
+arrayvec = "0.7.8"
+bytemuck = { version = "1.25.0", features = ["derive"] }
+libc = "0.2.186"
+mach2 = "0.6.0"
+pretty-hex = "0.4.2"
+pyo3 = "0.29.0"
+ureq = "3.3.0"
+url = "2.5.8"
