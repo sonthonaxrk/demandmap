@@ -67,7 +67,7 @@ let buf = cache.callback_buffer(
     length,
     path,
     etag, 
-    |url, range, mut buf| get(s3_url, range).read_into(buf));
+    |url, range, mut buf| get(url, range).read_into(buf));
 
 assert_eq!(buf[10000..10010], b"my s3 data");
 ```
