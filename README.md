@@ -30,8 +30,6 @@ buf2 = alloc.get("https://rollo-testing.lon1.digitaloceanspaces.com/big_col2.npz
 # Both over 400mb
 assert buf1.nbytes > 400000000
 assert buf2.nbytes > 400000000
-col1 = ndarray_from_npy_buffer(buf1)
-col2 = ndarray_from_npy_buffer(buf2)
 
 # But this takes ~100ms
 df = pl.DataFrame([
