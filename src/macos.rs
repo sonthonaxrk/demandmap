@@ -121,7 +121,7 @@ impl<R: std::fmt::Debug + Send + Sync + 'static> DiskAlloc<R> {
                             block: block_number as _,
                         },
                         |buf| {
-                            (data.cb)(&data.data, start..end - 1, &mut buf[..end - start]);
+                            (data.cb)(&data.data, start..end, &mut buf[..end - start]);
                         },
                     );
                     //

@@ -3,6 +3,7 @@ import math
 import operator
 import numpy as np
 from numpy.lib import format as npfmt
+import polars as pl
 
 
 class BufferReader:
@@ -58,10 +59,41 @@ def ndarray_from_npy_buffer(buf, *, max_header_size=10_000):
         order=order,
     )
 
+alloc = demandmap.S3Alloc(
+    "./cache.bin",
+    capacity=512,
+    block_size=1048576
+)
 
-arr = demandmap.S3Array("./cache.bin", "https://rollo-testing.lon1.digitaloceanspaces.com/big_col.npz.npy", 512, 1048576)
-print(arr.nbytes, "bytes")
+buf1 = alloc.get("https://rollo-testing.lon1.digitaloceanspaces.com/big_col.npz.npy")
+buf2 = alloc.get("https://rollo-testing.lon1.digitaloceanspaces.com/big_col2.npz.npy")
 
-assert arr.nbytes > 100000000
-a = ndarray_from_npy_buffer(arr)
-print(a[-1])
+# Both over 400mb
+assert buf1.nbytes > 400000000
+assert buf2.nbytes > 400000000
+col1 = ndarray_from_npy_buffer(buf1)
+col2 = ndarray_from_npy_buffer(buf2)
+
+# But this takes ~100ms
+df = pl.DataFrame([
+    ndarray_from_npy_buffer(buf1),
+    ndarray_from_npy_buffer(buf2)
+])
+# shape: (50_000_000, 2)
+# ┌──────────┬──────────┐
+# │ column_0 ┆ column_1 │
+# │ ---      ┆ ---      │
+# │ i64      ┆ i64      │
+# ╞══════════╪══════════╡
+# │ 0        ┆ 1000     │
+# │ 1        ┆ 1001     │
+# │ 2        ┆ 1002     │
+# │ 3        ┆ 1003     │
+# │ 4        ┆ 1004     │
+# │ …        ┆ …        │
+# │ 49999995 ┆ 50000995 │
+# │ 49999996 ┆ 50000996 │
+# │ 49999997 ┆ 50000997 │
+# │ 49999998 ┆ 50000998 │
+# │ 49999999 ┆ 50000999 │
+# └──────────┴──────────┘

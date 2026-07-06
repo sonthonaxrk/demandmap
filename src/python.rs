@@ -23,17 +23,21 @@ fn fetch_s3(url: &String, range: Range<usize>, buf: &mut [u8]) {
     buf[off..].fill(0);
 }
 
-#[pyclass(unsendable)]
-pub struct S3Array {
-    _disk: DiskAlloc<String>,
-    base: *const u8,
-    len: usize,
+#[pyclass]
+pub struct S3Alloc {
+    disk: DiskAlloc<String>,
 }
 
 #[pymethods]
-impl S3Array {
+impl S3Alloc {
     #[new]
-    fn new(path: String, url: String, capacity: u32, block_size: usize) -> PyResult<Self> {
+    fn new(path: String, capacity: u32, block_size: usize) -> Self {
+        S3Alloc {
+            disk: DiskAlloc::new(&path, capacity, block_size),
+        }
+    }
+
+    fn get(slf: Bound<'_, Self>, url: String) -> PyResult<Buffer> {
         let head = ureq::head(&url)
             .call()
             .map_err(|e| pyo3::exceptions::PyIOError::new_err(e.to_string()))?;
@@ -53,15 +57,25 @@ impl S3Array {
             .map(Md5Digest)
             .unwrap_or(Md5Digest(0));
 
-        let disk = DiskAlloc::new(&path, capacity, block_size);
         let (base, len) = {
-            let slice = disk.callback_buffer(size, url, md5, fetch_s3);
+            let this = slf.borrow();
+            let slice = this.disk.callback_buffer(size, url, md5, fetch_s3);
             (slice.as_ptr(), slice.len())
         };
 
-        Ok(S3Array { _disk: disk, base, len })
+        Ok(Buffer { _alloc: slf.unbind(), base, len })
     }
+}
 
+#[pyclass(unsendable)]
+pub struct Buffer {
+    _alloc: Py<S3Alloc>,
+    base: *const u8,
+    len: usize,
+}
+
+#[pymethods]
+impl Buffer {
     #[getter]
     fn nbytes(&self) -> usize {
         self.len
@@ -95,6 +109,7 @@ impl S3Array {
 
 #[pymodule]
 fn demandmap(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_class::<S3Array>()?;
+    m.add_class::<S3Alloc>()?;
+    m.add_class::<Buffer>()?;
     Ok(())
 }

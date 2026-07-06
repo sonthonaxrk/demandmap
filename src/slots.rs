@@ -655,7 +655,11 @@ mod tests {
         let etag = resp.headers().get("etag").unwrap().to_str().unwrap();
         let digest = Md5Digest(u128::from_str_radix(etag.trim_matches('"'), 16).unwrap());
 
-        let buf = cache.callback_buffer(length, path, digest, |p, range, mut buf| {
+        let buf = cache.callback_buffer(
+            length,
+            path,
+            digest, 
+            |p, range, mut buf| {
             ureq::get(*p)
                 .header(
                     "Range",
