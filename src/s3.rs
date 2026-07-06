@@ -1,6 +1,4 @@
-use std::io::Read;
 
-use pretty_hex::PrettyHex;
 
 #[test]
 fn req() {

@@ -1,8 +1,7 @@
-use std::alloc::{Layout, alloc_zeroed, dealloc, handle_alloc_error};
-use std::collections::{BTreeMap, BTreeSet, HashMap};
-use std::ffi::c_void;
-use std::fs::{self, File};
-use std::io::{self, Write};
+use std::alloc::{Layout, handle_alloc_error};
+use std::collections::BTreeMap;
+use std::fs::File;
+use std::io::Write;
 use std::ops::{Bound, Deref, Range, RangeBounds};
 use std::os::fd::AsRawFd;
 use std::path::{Path, PathBuf};
@@ -493,7 +492,7 @@ pub struct FixedSizeByteAlloc {
 unsafe impl Allocator for FixedSizeByteAlloc {
     fn allocate(
         &self,
-        layout: Layout,
+        _layout: Layout,
     ) -> Result<std::ptr::NonNull<[u8]>, allocator_api2::alloc::AllocError> {
         if !self.used.swap(true, std::sync::atomic::Ordering::AcqRel) {
             Ok(self.data)
@@ -502,7 +501,7 @@ unsafe impl Allocator for FixedSizeByteAlloc {
         }
     }
 
-    unsafe fn deallocate(&self, ptr: std::ptr::NonNull<u8>, layout: Layout) {}
+    unsafe fn deallocate(&self, _ptr: std::ptr::NonNull<u8>, _layout: Layout) {}
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -550,7 +549,7 @@ impl<R: std::fmt::Debug + Send + Sync + 'static> DiskAlloc<R> {
 
         let reqs: Arc<std::sync::Mutex<BTreeMap<PtrRange, Arc<ReqData<R>>>>> = Default::default();
 
-        let mut cache = unsafe {
+        let cache = unsafe {
             let ptr = libc::mmap(
                 null_mut(),
                 sz,

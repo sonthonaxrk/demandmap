@@ -1,4 +1,4 @@
-use std::{ffi::c_void, io::Write};
+use std::ffi::c_void;
 use std::io::Read;
 use std::ops::Range;
 

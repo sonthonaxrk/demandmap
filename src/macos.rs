@@ -2,10 +2,8 @@
 
 use std::cmp::min;
 use std::fmt::Debug;
-use std::io::Write;
-use std::{collections::BTreeMap, io::Cursor, sync::Arc};
+use std::{collections::BTreeMap, sync::Arc};
 
-use libc::{PROT_READ, PROT_WRITE};
 use mach2::exception_types::exception_type_t;
 use mach2::message::{
     MACH_MSG_TYPE_MAKE_SEND, MACH_RCV_MSG, mach_msg_body_t, mach_msg_port_descriptor_t,
@@ -64,7 +62,7 @@ fn get_containing<R: Clone>(
 
 impl<R: std::fmt::Debug + Send + Sync + 'static> DiskAlloc<R> {
     pub unsafe fn init_faulter(
-        base: *const u8,
+        _base: *const u8,
         req: Arc<std::sync::Mutex<BTreeMap<PtrRange, Arc<ReqData<R>>>>>,
         cache: Arc<Cache<FixedSizeByteAlloc>>,
     ) {
@@ -80,13 +78,13 @@ impl<R: std::fmt::Debug + Send + Sync + 'static> DiskAlloc<R> {
             THREAD_STATE_NONE,
         );
 
-        let t = std::thread::spawn(move || {
+        let _t = std::thread::spawn(move || {
             let res = std::panic::catch_unwind(|| {
                 loop {
                     let mut buf = [0u8; 1024];
                     let hdr = buf.as_mut_ptr() as *mut mach_msg_header_t;
 
-                    let res = mach_msg(
+                    let _res = mach_msg(
                         hdr,
                         MACH_RCV_MSG,
                         0,
@@ -98,7 +96,7 @@ impl<R: std::fmt::Debug + Send + Sync + 'static> DiskAlloc<R> {
 
                     let resp = hdr as *mut MemFaultExceptionRaise;
                     let resp = &*resp;
-                    let mut fault = resp.code.1;
+                    let fault = resp.code.1;
                     let page = fault.align_down(PAGE_SIZE);
                     let (ptr_range, data) = get_containing(&req, page).unwrap();
                     let block_size = cache.block_size();
@@ -113,7 +111,7 @@ impl<R: std::fmt::Debug + Send + Sync + 'static> DiskAlloc<R> {
                     // println!("{:p}", page);
                     // println!("Block_number {} {:x}", block_number, data.md5_digest.0);
 
-                    let slice = std::slice::from_raw_parts_mut(page, block_size as _);
+                    let _slice = std::slice::from_raw_parts_mut(page, block_size as _);
                     //
                     // println!("created slice");
 
@@ -173,7 +171,7 @@ impl<R: std::fmt::Debug + Send + Sync + 'static> DiskAlloc<R> {
                         RetCode: KERN_SUCCESS,
                     };
 
-                    let kr = mach_msg(
+                    let _kr = mach_msg(
                         &mut reply.Head,
                         MACH_SEND_MSG,
                         size_of::<__Reply__exception_raise_t>() as _,
